@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Humgut1 프로젝트</title>
+<meta name="description" content="이승헌이 직접 만든 HR 프로젝트 모음">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+:root {
+  --bg: #F7F7F5; --card: #FFFFFF; --fg: #17181C; --muted: #5E626B; --line: #E2E3E0;
+  --chip: #EFEFEC; --accent: #2F5BD3; --on-accent: #FFFFFF;
+  --c1: #2F5BD3; --c2: #6B4FD8; --c3: #C4501B; --c4: #0A8A55;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121316; --card: #1A1C21; --fg: #EDEDEA; --muted: #A2A5AD; --line: #2C2F36;
+    --chip: #24272E; --accent: #7EA0FF; --on-accent: #10131A;
+    --c1: #7EA0FF; --c2: #A895FF; --c3: #FF9466; --c4: #4FD49A;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  line-height: 1.65; word-break: keep-all; -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+.wrap { max-width: 980px; margin: 0 auto; padding: 0 16px; }
+
+header { padding: 72px 0 40px; }
+.kicker { font-size: 14px; color: var(--muted); margin: 0 0 10px; letter-spacing: .02em; }
+h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.25; margin: 0 0 14px; font-weight: 700; }
+.lead { font-size: 17px; color: var(--muted); max-width: 620px; margin: 0; }
+.links { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
+
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; padding-bottom: 64px; }
+@media (max-width: 720px) { .grid { grid-template-columns: 1fr; } header { padding: 48px 0 28px; } }
+
+.card {
+  background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+  padding: 24px; display: flex; flex-direction: column; position: relative; overflow: hidden;
+}
+.card::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 4px; background: var(--tone); }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+.type { font-size: 13px; font-weight: 500; color: var(--tone); }
+.repo { font-size: 12px; color: var(--muted); font-family: ui-monospace, "Cascadia Code", Consolas, monospace; }
+h2 { font-size: 21px; margin: 0 0 8px; line-height: 1.35; }
+.desc { margin: 0 0 14px; color: var(--muted); font-size: 15px; }
+ul { margin: 0 0 18px; padding-left: 18px; font-size: 14.5px; }
+li { margin: 3px 0; }
+.stack { display: flex; flex-wrap: wrap; gap: 6px; margin: auto 0 18px; }
+.stack span { font-size: 12px; background: var(--chip); padding: 3px 9px; border-radius: 999px; color: var(--muted); }
+.btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-size: 14px; font-weight: 500;
+  padding: 8px 14px; border-radius: 9px; border: 1px solid var(--line); transition: background .15s, border-color .15s;
+}
+.btn:hover { border-color: var(--fg); }
+.btn.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.off { color: var(--muted); border-style: dashed; cursor: default; }
+.btn.off:hover { border-color: var(--line); }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+footer { border-top: 1px solid var(--line); padding: 24px 0 40px; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="kicker">HR · 개인 프로젝트 모음</p>
+    <h1>직접 만든 HR 도구들</h1>
+    <p class="lead">채용 코디네이터로 일하며 불편했던 것들을 직접 만들어 보고 있습니다. 인사 시스템, 채용 관리, 채용 시장 데이터 수집까지 하나씩 모았습니다.</p>
+    <div class="links">
+      <a class="btn" href="https://humgut1.github.io/hr-portfolio/">소개 보기</a>
+      <a class="btn" href="https://github.com/Humgut1">GitHub</a>
+    </div>
+  </header>
+
+  <main class="grid">
+    <article class="card" style="--tone: var(--c1)">
+      <div class="top"><span class="type">HR 플랫폼</span><span class="repo">hr-system</span></div>
+      <h2>TalentCore Core</h2>
+      <p class="desc">직원·조직·근태·급여·성과를 한 곳에서 다루는 한국형 HR 플랫폼. 근로기준법을 기본 동작으로 지킵니다.</p>
+      <ul>
+        <li>약 180명 규모 샘플 회사로 모든 화면을 둘러볼 수 있는 데모</li>
+        <li>급여 밴드·Compa-Ratio, 평가 단계, 조직도, 휴가 승인</li>
+        <li>TalentCore 제품군의 계정·명부 원본 (SSO)</li>
+      </ul>
+      <div class="stack"><span>Flask</span><span>SQLite</span><span>Claude Code</span></div>
+      <div class="btns">
+        <a class="btn primary" href="https://talentcore.duckdns.org">데모 보기</a>
+        <a class="btn" href="https://github.com/Humgut1/hr-system">코드</a>
+      </div>
+    </article>
+
+    <article class="card" style="--tone: var(--c2)">
+      <div class="top"><span class="type">채용 관리 (ATS)</span><span class="repo">talentcore-hire</span></div>
+      <h2>TalentCore Hire</h2>
+      <p class="desc">면접 일정은 조율하지 않고 잡힙니다. 슬롯 탐색·발송·리마인드는 시스템이, 협상이 필요한 순간만 사람이.</p>
+      <ul>
+        <li>공고 보드 한 화면에서 조율·판정·평가·오퍼까지</li>
+        <li>면접관 여러 명의 연속 빈 시간을 찾아 제안</li>
+        <li>색은 상태에만: 사람이 볼 것만 눈에 띄게</li>
+      </ul>
+      <div class="stack"><span>Next.js</span><span>Supabase</span><span>TypeScript</span></div>
+      <div class="btns">
+        <a class="btn primary" href="https://talentcore-hire.vercel.app">사이트 보기</a>
+        <a class="btn" href="https://github.com/Humgut1/talentcore-hire">코드</a>
+      </div>
+    </article>
+
+    <article class="card" style="--tone: var(--c4)">
+      <div class="top"><span class="type">채용 데이터 봇</span><span class="repo">musinsa-jobs-bot</span></div>
+      <h2>채용공고 일일 점검 봇</h2>
+      <p class="desc">36개 회사의 채용 공고를 매일 읽어 전날과 비교하고, 변화를 디스코드로 알려 줍니다.</p>
+      <ul>
+        <li>커머스·IT·핀테크·게임 등 산업별로 공고 수와 증감 정리</li>
+        <li>새 공고·마감·수정 감지, HR 공고는 따로 모아 요약</li>
+        <li>GitHub Actions로 매일 자동 실행, 대시보드도 갱신</li>
+      </ul>
+      <div class="stack"><span>Python</span><span>GitHub Actions</span><span>Discord</span></div>
+      <div class="btns">
+        <a class="btn primary" href="https://humgut1.github.io/hr-dashboard/">대시보드 보기</a>
+        <span class="btn off" title="코드는 비공개 저장소입니다">코드 비공개</span>
+      </div>
+    </article>
+
+    <article class="card" style="--tone: var(--c3)">
+      <div class="top"><span class="type">소개 사이트</span><span class="repo">hr-portfolio</span></div>
+      <h2>포트폴리오</h2>
+      <p class="desc">“일로 왔어요” / “커피챗 하러 왔어요”를 고르면 말투와 디자인이 바뀌는 자기소개 사이트.</p>
+      <ul>
+        <li>내용은 같고 옷(분위기)만 갈아입는 구조</li>
+        <li>학력·경력·프로젝트·자격증·연락처</li>
+        <li>기획부터 제작까지 직접</li>
+      </ul>
+      <div class="stack"><span>HTML</span><span>CSS</span><span>GitHub Pages</span></div>
+      <div class="btns">
+        <a class="btn primary" href="https://humgut1.github.io/hr-portfolio/">사이트 보기</a>
+        <a class="btn" href="https://github.com/Humgut1/hr-portfolio">코드</a>
+      </div>
+    </article>
+  </main>
+</div>
+<footer><div class="wrap">© 2026 Humgut1 · GitHub Pages로 만들었습니다.</div></footer>
+</body>
+</html>
