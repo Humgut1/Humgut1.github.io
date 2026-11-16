@@ -115,6 +115,23 @@ a { color: inherit; }
 .stack { display: flex; flex-wrap: wrap; gap: 6px; margin: auto 0 18px; }
 .stack span { font-size: 12px; background: var(--chip); padding: 3px 10px; border-radius: 99px; color: var(--muted); }
 
+/* 검색 */
+.search { position: relative; z-index: 1; display: flex; align-items: center; gap: 10px; background: var(--ice); border: 2px solid var(--navy); border-radius: 99px; box-shadow: 3px 3px 0 var(--navy); padding: 4px 6px 4px 16px; margin: 0 0 14px; }
+.search svg { width: 18px; height: 18px; flex: none; color: var(--muted); }
+.search input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--fg); font: inherit; font-size: 16px; padding: 8px 0; }
+.search input::placeholder { color: var(--muted); }
+.search input::-webkit-search-cancel-button { display: none; }
+.search kbd { font: 12px ui-monospace, Consolas, monospace; color: var(--muted); border: 1px solid var(--ice-edge); border-radius: 6px; padding: 2px 7px; }
+.search button { border: 0; background: var(--chip); color: var(--muted); border-radius: 99px; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; }
+.search:focus-within { outline: 3px solid var(--beak); outline-offset: 3px; }
+.hits { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
+.hits:empty { display: none; }
+.hits a { text-decoration: none; font-size: 14px; background: var(--chip); border: 1px solid var(--ice-edge); border-radius: 99px; padding: 6px 12px; }
+.hits a b { font-weight: 700; }
+.hits a small { color: var(--muted); font-size: 12px; margin-left: 4px; }
+.hits a:hover { border-color: var(--navy); }
+.nohit { position: relative; z-index: 1; color: var(--muted); padding: 8px 0 40px; display: none; }
+
 /* 발자국 */
 footer { position: relative; z-index: 1; padding: 20px 0 48px; color: var(--muted); font-size: 14px; text-align: center; }
 .steps { display: flex; justify-content: center; gap: 18px; margin-bottom: 12px; opacity: .7; }
@@ -167,7 +184,14 @@ footer { position: relative; z-index: 1; padding: 20px 0 48px; color: var(--mute
     <h2 class="jua">펭귄들이 만든 것</h2>
     <p>카드 하나에 펭귄 하나, 프로젝트 하나</p>
   </div>
+  <label class="search">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+    <input id="q" type="search" placeholder="무엇을 찾나요? 예: 게임, 급여, 면접" aria-label="사이트 검색" autocomplete="off">
+    <kbd id="qk" aria-hidden="true">/</kbd><button id="qx" type="button" hidden>지우기</button>
+  </label>
+  <div class="hits" id="hits" aria-live="polite"></div>
   <main class="grid" id="grid"></main>
+  <p class="nohit" id="nohit">맞는 게 없어요. 다른 말로 찾아 보세요.</p>
 </div>
 
 <footer>
@@ -233,9 +257,17 @@ const projects = [
     art: svg(feet + body + jacket('#E2703A', '#3A2A1E') + '<path d="M152 185L170 232L188 185Z" fill="#F7F5F0" stroke="#3A2A1E" stroke-width="2" stroke-linejoin="round"/>' + sleeves('#E2703A', '#3A2A1E') + mug + beak + eyes + blush + roundGlasses + cowlick) }
 ];
 
+// 검색에만 쓰는 하위 페이지 (카드 버튼에 없는 것)
+const extraPages = [
+  { project: 2, name: '골라 보기 (피벗)', url: 'https://humgut1.github.io/hr-dashboard/explore/pivot.html', words: '피벗 pivot 직군 직무 회사 골라 보기 표 공고 수' },
+  { project: 2, name: '게임 대시보드', url: 'https://humgut1.github.io/hr-dashboard/explore/game.html', words: '게임 game 넥슨 엔씨 넷마블 크래프톤 스튜디오 국민연금 인원' },
+  { project: 3, name: '펭귄 그림 모음', url: 'https://humgut1.github.io/hr-portfolio/penguins.html', words: '펭귄 그림 캐릭터 일러스트' },
+  { project: 3, name: '이력서', url: 'https://humgut1.github.io/hr-portfolio/resume.html', words: '이력서 resume 경력 학력 자격증' }
+];
+
 const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 document.getElementById('grid').innerHTML = projects.map(p => `
-  <article class="card">
+  <article class="card" data-i="${projects.indexOf(p)}">
     <div class="art" style="--tint:${p.tint}"><span class="role">${p.role}</span>${p.art}</div>
     <div class="body">
       <div class="top"><span class="type">${p.type}</span><span class="repo">${p.repo}</span></div>
@@ -248,6 +280,35 @@ document.getElementById('grid').innerHTML = projects.map(p => `
         : `<span class="btn off" title="비공개 저장소예요">${t}</span>`).join('')}</div>
     </div>
   </article>`).join('');
+
+// 검색: 카드를 거르고, 맞는 페이지를 바로 가기 칩으로 보여 준다
+const norm = s => s.toLowerCase().replace(/\s+/g, ' ');
+const hay = projects.map(p => norm([p.role, p.type, p.repo, p.name, p.desc, ...p.points, ...p.stack, ...p.links.map(l => l[0])].join(' ')));
+const pages = [];
+projects.forEach((p, i) => p.links.forEach(([t, u]) => u && pages.push({ project: i, name: t, url: u, words: '' })));
+extraPages.forEach(x => { if (!pages.some(y => y.url === x.url)) pages.push(x); else Object.assign(pages.find(y => y.url === x.url), { words: x.words }); });
+const q = document.getElementById('q'), qx = document.getElementById('qx'), qk = document.getElementById('qk');
+const cards = [...document.querySelectorAll('.card')];
+function search() {
+  const words = norm(q.value).trim().split(' ').filter(Boolean);
+  const hit = t => words.every(w => t.includes(w));
+  let shown = 0;
+  cards.forEach(c => { const ok = !words.length || hit(hay[c.dataset.i]); c.hidden = !ok; c.style.display = ok ? '' : 'none'; shown += ok; });
+  // 페이지 이름·설명에 바로 맞는 것을 앞에, 프로젝트 전체에 맞는 것을 뒤에
+  const direct = words.length ? pages.filter(g => hit(norm(g.name + ' ' + g.words))) : [];
+  const list = words.length ? direct.concat(pages.filter(g => !direct.includes(g) && hit(hay[g.project]))) : [];
+  document.getElementById('hits').innerHTML = list.slice(0, 12).map(g =>
+    `<a href="${g.url}"><b>${esc(g.name)}</b><small>${esc(projects[g.project].name.split(' · ')[0])}</small></a>`).join('');
+  document.getElementById('nohit').style.display = words.length && !shown && !list.length ? 'block' : 'none';
+  qx.hidden = !q.value; qk.hidden = !!q.value;
+  try { history.replaceState(null, '', q.value ? '?q=' + encodeURIComponent(q.value) + '#projects' : location.pathname); } catch (e) {}
+}
+q.addEventListener('input', search);
+qx.addEventListener('click', () => { q.value = ''; search(); q.focus(); });
+q.addEventListener('keydown', e => { if (e.key === 'Escape') { q.value = ''; search(); } if (e.key === 'Enter') { const a = document.querySelector('#hits a'); if (a) location.href = a.href; } });
+addEventListener('keydown', e => { if (e.key === '/' && document.activeElement !== q && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); q.focus(); } });
+const q0 = new URLSearchParams(location.search).get('q');
+if (q0) { q.value = q0; search(); }
 
 // 발자국
 const foot = '<svg viewBox="0 0 24 24"><path d="M12 21V8M12 21L5 5M12 21L19 5" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none"/></svg>';
